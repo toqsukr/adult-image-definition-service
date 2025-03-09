@@ -17,7 +17,7 @@ model = load_model(model_path)
 def predict_image(image):
     image = img_to_array(image) / 255.0
     image = np.expand_dims(image, axis=0)
-    prediction = model.predict(image)[0][0] * 100
+    prediction = model.predict(image)[0][0]
     return float(prediction) 
 
 @app.post("/predict")
