@@ -18,7 +18,7 @@ def predict_image(image):
     image = img_to_array(image) / 255.0
     image = np.expand_dims(image, axis=0)
     prediction = model.predict(image)[0][0]
-    return float(prediction) 
+    return float(prediction).toFixed(2) 
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
