@@ -18,7 +18,7 @@ def predict_image(image):
     image = img_to_array(image) / 255.0
     image = np.expand_dims(image, axis=0)
     prediction = model.predict(image)[0][0]
-    return float(prediction).toFixed(2) 
+    return float(prediction) 
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
@@ -29,7 +29,9 @@ async def predict(file: UploadFile = File(...)):
         
         probability = predict_image(image)
         
-        return JSONResponse(content={"probability": probability})
+        probability_rounded = round(probability, 2)
+        
+        return JSONResponse(content={"probability": probability_rounded})
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
