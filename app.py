@@ -5,6 +5,17 @@ from tensorflow.keras.models import load_model
 import os
 from fastapi.responses import JSONResponse
 from io import BytesIO
+import logging
+from datetime import datetime
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler() 
+    ]
+)
 
 app = FastAPI()
 
@@ -23,6 +34,8 @@ def predict_image(image):
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     try:
+        logging.info(f"Received file: {file.filename}")
+
         image_data = BytesIO(await file.read())
         
         image = load_img(image_data, target_size=(224, 224))
@@ -30,9 +43,12 @@ async def predict(file: UploadFile = File(...)):
         probability = predict_image(image)
         
         probability_rounded = round(probability, 2)
+
+        logging.info(f"File: {file.filename}, Prediction: {probability_rounded}")
         
         return JSONResponse(content={"probability": probability_rounded})
     except Exception as e:
+        logging.error(f"Error processing file: {file.filename}. Error: {str(e)}")
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
 if __name__ == "__main__":
